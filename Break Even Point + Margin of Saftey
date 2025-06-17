@@ -1,0 +1,68 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# User input
+fixed_cost = float(input("Enter fixed cost: "))
+variable_cost = float(input("Enter variable cost per unit: "))
+price_per_unit = float(input("Enter selling price per unit: "))
+actual_sales_qty = float(input("Enter actual or expected sales quantity: "))
+
+# Check for valid break-even condition
+if price_per_unit <= variable_cost:
+    print("No break-even point: price must be greater than variable cost.")
+else:
+    # Calculate break-even and margin of safety
+    break_even_qty = fixed_cost / (price_per_unit - variable_cost)
+    break_even_qty = round(break_even_qty, 2)
+    break_even_revenue = price_per_unit * break_even_qty
+
+    margin_of_safety = actual_sales_qty - break_even_qty
+    margin_text = f"Margin of Safety: {margin_of_safety:.2f} units" if margin_of_safety > 0 else "No Margin of Safety"
+
+    # Generate data
+    max_qty = int(max(actual_sales_qty, break_even_qty) * 1.2)
+    quantities = np.linspace(0, max_qty, 500)
+    total_revenue = price_per_unit * quantities
+    total_cost = fixed_cost + variable_cost * quantities
+
+    # Plot setup
+    plt.figure(figsize=(10, 6))
+    plt.plot(quantities, total_revenue, label="Total Revenue", color="green")
+    plt.plot(quantities, total_cost, label="Total Cost", color="red")
+
+    # Break-even point
+    plt.plot(break_even_qty, break_even_revenue, 'bo', label="Break-Even Point")
+
+    # Dashed L-shape to BEP
+    plt.plot([break_even_qty, break_even_qty], [0, break_even_revenue], 'b--', alpha=0.5)
+    plt.plot([0, break_even_qty], [break_even_revenue, break_even_revenue], 'b--', alpha=0.5)
+
+    # Margin of Safety
+    if margin_of_safety > 0:
+        # Shaded area
+        plt.axvspan(break_even_qty, actual_sales_qty, color='lightgreen', alpha=0.3, label="Margin of Safety")
+
+        # Dotted line at actual sales
+        actual_sales_revenue = price_per_unit * actual_sales_qty
+        plt.plot([actual_sales_qty, actual_sales_qty], [0, actual_sales_revenue], 'g--', alpha=0.7)
+
+    # Annotation for BEP
+    plt.annotate(f"BEP: {break_even_qty} units\nRevenue: ${break_even_revenue:.2f}",
+                 (break_even_qty, break_even_revenue),
+                 textcoords="offset points", xytext=(20, -30),
+                 arrowprops=dict(arrowstyle="->"))
+
+    # Labels and legend
+    plt.title("Break-Even Analysis with Margin of Safety")
+    plt.xlabel("Quantity")
+    plt.ylabel("Cost / Revenue")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+    # Console output
+    print(f"\nBreak-Even Quantity: {break_even_qty} units")
+    print(f"Actual Sales Quantity: {actual_sales_qty} units")
+    print(f"{margin_text}")
+
+    plt.show()
